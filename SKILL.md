@@ -13,6 +13,7 @@ description: Use when creating, adapting, explaining, testing, or automating a C
 - API 执行副本：`D:\Comfy-Desktop\ComfyUI-Shared\workflow-library\api\<slug>.api.json`
 - 随工作流交付的说明：与画布母版同目录的 `<slug>.说明.md`。从 `assets\workflow-说明-template.md` 复制并填满。
 - 实际运行后才可增加 `<slug>.运行记录.md`，记录 seed、实际模型、输入资产、输出文件和验证范围。
+- 本机 Desktop 可发现副本：`D:\Comfy-Desktop\ComfyUI-Installs\ComfyUI\ComfyUI\user\default\workflows\<slug>.json`。它只用于侧边栏打开；母版仍以 Shared 的画布文件为准。
 
 画布 JSON 是给用户在 ComfyUI 中查看、拖拽和继续编辑的母版。API JSON 是提交 `POST http://127.0.0.1:8188/prompt` 的节点输入图，不是同一种文件格式。
 
@@ -29,6 +30,17 @@ description: Use when creating, adapting, explaining, testing, or automating a C
 3. 查询本机 `http://127.0.0.1:8188/object_info`，据实际 `class_type`、输入字段和模型下拉值组织节点。API 不可用时，先报告“无法运行验证”，不要臆测安装状态。
 4. 区分核心节点、已安装第三方节点与缺失节点。缺失节点或模型只报告 D 盘目标路径、容量和可信下载链接；未经用户授权不得安装或下载。
 5. 外部视频 API 节点必须能显式传入模型 ID、关键参数与密钥的安全配置路径；不具备时说明能力缺口。不得把 API key 写入 JSON、说明或提示词。
+
+## 结构引导素材补齐
+
+当 PuLID + Union ControlNet 的镜头要求头盔、服装、道具、姿态或构图等可见结构，而当前 Canny/Depth/Pose 引导图没有该结构时，不要直接以提示词代替约束。按以下顺序主动补齐：
+
+1. 搜索当前项目的授权角色卡、参考图、道具图和既有关键帧，优先选择同时匹配所需结构和镜头角度的素材；不得修改或覆盖原资产。
+2. 从合适素材提取或生成对应的 Canny、Depth 或 Pose 引导；若结构与目标镜头不相符，使用确定性裁剪/合成仅制作新的引导副本，并保留来源记录。
+3. 若项目资产没有足够的结构参考，使用内置 `image_gen` 生成仅用于 ControlNet 结构约束的参考图，再从该图生成引导。标记它为合成引导图，不得把它伪称为角色原始参考或最终交付图。
+4. 每次尝试都把结构参考、最终引导图和输出并列展示，确认头盔/服装/道具轮廓实际进入引导图；最多完成两种合理引导方案。仍不能满足镜头要求时，再明确说明缺什么并请用户提供素材。
+
+这条补齐流程不替代身份参考：PuLID 仍使用授权角色参考图，ControlNet 引导只承担姿态、构图和可见结构约束。
 
 ## 节点方案与成对生成
 
@@ -65,6 +77,9 @@ description: Use when creating, adapting, explaining, testing, or automating a C
 2. 仅在用户允许生成且 ComfyUI API 正常时，用 API JSON 做单镜 smoke test。允许替换的字段仅限说明中列出的首/尾帧、提示词、时长/分辨率、seed 等。
 3. 记录实际输出、耗时、种子和错误。`任务接受`、`队列成功`、`节点不报错`只证明链路，不能证明画面质量、人物连续性或首尾帧合格。
 4. 批量执行前，让用户确认单镜结果或明确授权；第三方服务提交仍须遵守项目的上下文提交包、模型选择和用户授权规则。
+5. 需要声明 Desktop 画布通过时，将当前画布副本放入上述 Desktop 发现目录，在工作流侧边栏双击打开为独立标签，确认图形、连线可见且未出现缺失节点/模型提示。先新建空白标签，绝不覆盖用户已有未保存画布；这项验收仍不等于视觉质量通过。
+
+Wan T2V 的原生入口没有参考图输入时，只能验收运行和基础语义，不能验收角色卡身份一致性。PuLID + Union 的 API 成功也只证明节点链路；必须把输出脸部与授权参考图并列人工检查，且 ControlNet 引导图必须实际包含要约束的服装/道具轮廓。Canvas/API 三件套和 API 输出不能替代在 Desktop 画布中打开、检查缺失节点/模型与连线的验收。
 
 ## 用户如何使用交付物
 
