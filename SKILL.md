@@ -23,7 +23,6 @@ description: Use when creating, adapting, explaining, testing, or automating a C
 
 每次 API 工作前先请求 `/object_info`。若不可用，检查该任务状态并启动同名任务；不要改写任务、启动脚本、端口或监听地址，除非用户明确要求。登录后冷启动约需半分钟；API 返回 200 才能提交工作流。
 
-
 ## 本机已验证模型（2026-08-06）
 
 | 模型 | 文件路径（均在 `D:\Comfy-Desktop\ComfyUI-Shared\models`） | 验证状态 |
@@ -66,8 +65,16 @@ Wan 2.2 T2V 14B 快路径参数：高/低噪声各 4 步（LightX2V v1.1 LoRA）
 | 相邻镜头无切换 | 前镜尾帧 = 后镜首帧；入口不支持尾帧时明确标注 |
 | 精确文字、价格、余额、商品 UI | 使用确定性后期合成；不要让生成模型重画 |
 | 第三方视频服务 | 素材 → 显式 model/duration/resolution/audio → API 节点 → 输出 |
+| 角色/参考一致性视频 | 参考视频 → Wan2ReferenceVideoApi / MiniMaxH3ReferenceToVideo → 采样 → 输出 |
+| 视频续写 / 相邻镜头边界 | 前镜尾帧 → Wan2VideoContinuationApi（或 WanFirstLastFrameToVideo）→ 后镜首帧 |
+| 首尾帧控制 | 首帧 + 尾帧 → WanFirstLastFrameToVideo → 中间过渡 |
+| 镜头运动控制 | 参考/轨迹 → WanCameraImageToVideo / WanCameraEmbedding → 运镜 |
+| 长视频 | WanContextWindowsManual 上下文窗口分段生成 |
+| 本地加速 | MiniMaxH3TeaCache / TESpeedMiniMaxH3 / MiniMaxH3SigmaShift |
 
 MiniMax H3 本地工作流已入库：`minimax-h3-t2v` 与 `minimax-h3-i2v`（Canvas/API/说明三件套）。依赖四件模型：`unet\MiniMax-H3-FL2VA-Q4_K_M.gguf`、`text_encoders\qwen3vl_32b_minimax_h3-Q4_K_M.gguf`、`vae\minimax_h3_video_vae_fp16.safetensors`、`vae\minimax_h3_audio_vae_fp32.safetensors`；加载器为 UnetLoaderGGUF、CLIPLoaderGGUF（type=minimax）、VAELoader×2。默认采样 res_multistep / simple / 25 steps；4090+32GB 可用但偏慢（约数分钟/段）。2026-08-06 T2V 冒烟测试已通过（H.264 24fps + AAC 32kHz 立体声）。
+
+新节点验收状态（2026-08-06）：`Wan2ReferenceVideoApi`、`MiniMaxH3ReferenceToVideo`、`Wan2VideoContinuationApi`、`WanFirstLastFrameToVideo`、`WanCameraImageToVideo`、`WanCameraEmbedding`、`WanContextWindowsManual`、`TESpeedMiniMaxH3` 均已在本机 `/object_info` 出现，但除 MiniMax T2V/I2V 与 Wan I2V/T2V 14B 外，尚未逐个建立 Canvas/API 三件套和 smoke 记录。引用这些节点时按标准流程先建工作流并记录运行，不得把“节点存在”说成“能力已验证”。
 
 画布文件和 API 文件必须表达同一逻辑。优先由已验证的画布母版导出 API 格式；无法导出时，依据本机 `object_info` 生成 API 图，并把“由节点签名生成、尚未在画布反向验证”写进说明。
 
