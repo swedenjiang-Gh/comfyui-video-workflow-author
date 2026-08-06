@@ -23,6 +23,18 @@ description: Use when creating, adapting, explaining, testing, or automating a C
 
 每次 API 工作前先请求 `/object_info`。若不可用，检查该任务状态并启动同名任务；不要改写任务、启动脚本、端口或监听地址，除非用户明确要求。登录后冷启动约需半分钟；API 返回 200 才能提交工作流。
 
+
+## 本机已验证模型（2026-08-06）
+
+| 模型 | 文件路径（均在 `D:\Comfy-Desktop\ComfyUI-Shared\models`） | 验证状态 |
+|---|---|---|
+| Wan 2.2 I2V 14B FP8 | `diffusion_models\wan2.2_i2v_high/low_noise_14B_fp8_scaled.safetensors`；`loras\wan2.2_i2v_lightx2v_4steps_lora_v1_high/low_noise.safetensors` | I2V 链路 pass（2026-08-02 smoke；2026-08-06 A/B 832×480/3s ≈ 1.50 min） |
+| Wan 2.2 T2V 14B FP8 | `diffusion_models\wan2.2_t2v_high/low_noise_14B_fp8_scaled.safetensors`；`loras\wan2.2_t2v_lightx2v_4steps_lora_v1.1_high/low_noise.safetensors` | T2V 链路 pass（2026-08-06 A/B 832×480/3s ≈ 2.10 min，无声） |
+| Wan 2.1 T2V 1.3B FP16 | `diffusion_models\wan2.1_t2v_1.3B_fp16.safetensors` | 语义 smoke pass，非生产画质 |
+| MiniMax H3 FL2VA Q4 | `unet\MiniMax-H3-FL2VA-Q4_K_M.gguf`；`text_encoders\qwen3vl_32b_minimax_h3-Q4_K_M.gguf`；`vae\minimax_h3_video_vae_fp16.safetensors`、`vae\minimax_h3_audio_vae_fp32.safetensors` | T2V/I2V pass（含原生 32kHz 立体声）；TeaCache ≈ 2.05×（2026-08-06） |
+
+Wan 2.2 T2V 14B 快路径参数：高/低噪声各 4 步（LightX2V v1.1 LoRA），CFG 1.0，shift 5.0，euler/simple；48 帧@16fps ≈ 3 秒（832×480）。输出为无声 MP4，配音走后期。
+
 ## 工作流前置检查
 
 1. 阅读当前项目的 `AGENTS.md`、README、分镜/计划和资产状态；遵守其中优先级与提交规则。
