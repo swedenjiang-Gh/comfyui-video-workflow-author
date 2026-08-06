@@ -1,6 +1,6 @@
 ---
 name: comfyui-video-workflow-author
-description: Use when creating, adapting, explaining, testing, or automating a ComfyUI video workflow, including Wan I2V, FLUX keyframes, ControlNet, PuLID, video API nodes, canvas workflow JSON, or ComfyUI `/prompt` API JSON. Generate matching importable canvas and API workflow artifacts, store reusable pairs, and explain nodes, generation principles, parameters, dependencies, and verification limits.
+description: Use when creating, adapting, explaining, testing, or automating a ComfyUI video workflow, including Wan I2V, MiniMax H3 (GGUF), FLUX keyframes, ControlNet, PuLID, video API nodes, canvas workflow JSON, or ComfyUI `/prompt` API JSON. Generate matching importable canvas and API workflow artifacts, store reusable pairs, and explain nodes, generation principles, parameters, dependencies, and verification limits.
 ---
 
 # ComfyUI 视频工作流编排
@@ -50,9 +50,12 @@ description: Use when creating, adapting, explaining, testing, or automating a C
 | --- | --- |
 | 角色一致关键帧 + 姿态/构图 | 参考图 → PuLID-Flux → FLUX Union ControlNet → 图像输出 |
 | 本地 Wan 图生视频 | 首帧 → Wan I2V 高/低噪声阶段 → 采样 → VAE 解码 → 视频合成 |
+| 本地 MiniMax H3 文/图生视频 | GGUF FL2VA → MiniMaxH3ImageToVideo（首/尾帧可选）→ res_multistep 采样 → 视频+音频 VAE 解码 → CreateVideo（原生 32kHz 立体声） |
 | 相邻镜头无切换 | 前镜尾帧 = 后镜首帧；入口不支持尾帧时明确标注 |
 | 精确文字、价格、余额、商品 UI | 使用确定性后期合成；不要让生成模型重画 |
 | 第三方视频服务 | 素材 → 显式 model/duration/resolution/audio → API 节点 → 输出 |
+
+MiniMax H3 本地工作流已入库：`minimax-h3-t2v` 与 `minimax-h3-i2v`（Canvas/API/说明三件套）。依赖四件模型：`unet\MiniMax-H3-FL2VA-Q4_K_M.gguf`、`text_encoders\qwen3vl_32b_minimax_h3-Q4_K_M.gguf`、`vae\minimax_h3_video_vae_fp16.safetensors`、`vae\minimax_h3_audio_vae_fp32.safetensors`；加载器为 UnetLoaderGGUF、CLIPLoaderGGUF（type=minimax）、VAELoader×2。默认采样 res_multistep / simple / 25 steps；4090+32GB 可用但偏慢（约数分钟/段）。2026-08-06 T2V 冒烟测试已通过（H.264 24fps + AAC 32kHz 立体声）。
 
 画布文件和 API 文件必须表达同一逻辑。优先由已验证的画布母版导出 API 格式；无法导出时，依据本机 `object_info` 生成 API 图，并把“由节点签名生成、尚未在画布反向验证”写进说明。
 
