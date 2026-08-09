@@ -17,11 +17,11 @@ description: Use when creating, adapting, explaining, testing, or automating a C
 
 画布 JSON 是给用户在 ComfyUI 中查看、拖拽和继续编辑的母版。API JSON 是提交 `POST http://127.0.0.1:8188/prompt` 的节点输入图，不是同一种文件格式。
 
-## 本机 API 自启
+## 本机 API 按需启动
 
-本机已配置名为 `ComfyUI Local API` 的当前用户登录任务。它运行 `D:\Comfy-Desktop\ComfyUI-Shared\scripts\Start-ComfyUI-Api.ps1`，使用 `ComfyUI\.venv\Scripts\python.exe` 启动后端，并且只监听 `127.0.0.1:8188`；不需要打开 Desktop 界面。
+本机已配置名为 `ComfyUI Local API` 的当前用户按需任务。它运行 `D:\Comfy-Desktop\ComfyUI-Shared\scripts\Start-ComfyUI-Api.ps1`，使用 `ComfyUI\.venv\Scripts\python.exe` 启动后端，并且只监听 `127.0.0.1:8188`；不需要打开 Desktop 界面，也不应在登录 Windows 时常驻。
 
-每次 API 工作前先请求 `/object_info`。若不可用，检查该任务状态并启动同名任务；不要改写任务、启动脚本、端口或监听地址，除非用户明确要求。登录后冷启动约需半分钟；API 返回 200 才能提交工作流。
+每次 API 工作前先请求 `/object_info`。若不可用，检查该任务状态并启动同名任务；不要改写任务、启动脚本、端口或监听地址，除非用户明确要求。冷启动约需半分钟；API 返回 200 才能提交工作流。任务完成后先确认 `/queue` 为空且没有可见 Desktop 或其他生成任务复用该后端，再只关闭任务拥有的隐藏 API 进程。视频分析、反推提示词、ASR/OCR、字幕和 32B 融合不需要 ComfyUI，不要为这些任务启动它，也不要让 H3/Wan 与 32B 融合并行占用 GPU。
 
 ## 本机已验证模型（2026-08-06）
 
