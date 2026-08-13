@@ -82,6 +82,8 @@ MiniMax H3 本地工作流已入库：`minimax-h3-t2v` 与 `minimax-h3-i2v`（Ca
 
 ## 参数说明要求
 
+For Video-Depth-Anything workflows, grayscale output is always the structural deliverable. The Canvas/API pair may expose an explicit optional `inferno` preview branch; when disabled, do not create or save the color video, and when enabled, map the already-computed depth array without rerunning the model.
+
 在每份说明中按实际节点解释这些项；未使用的项不要伪造：
 
 - **模型与 LoRA**：决定能力与视觉先验；LoRA 权重越高，风格/动作约束越强，也越可能压制原始构图或产生过拟合。
