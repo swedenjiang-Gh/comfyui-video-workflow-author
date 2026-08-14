@@ -33,7 +33,7 @@ description: Use when creating, adapting, explaining, testing, or automating a C
 
 | 模型 | 文件路径（均在 `D:\Comfy-Desktop\ComfyUI-Shared\models`） | 验证状态 |
 |---|---|---|
-| Wan 2.2 I2V 14B FP8 | `diffusion_models\wan2.2_i2v_high/low_noise_14B_fp8_scaled.safetensors`；`loras\wan2.2_i2v_lightx2v_4steps_lora_v1_high/low_noise.safetensors` | I2V 链路 pass（2026-08-02 smoke；2026-08-06 A/B 832×480/3s ≈ 1.50 min） |
+| Wan 2.2 I2V 14B FP8 | `diffusion_models\wan2.2_i2v_high/low_noise_14B_fp8_scaled.safetensors`；`loras\wan2.2_i2v_lightx2v_4steps_lora_v1_high/low_noise.safetensors` | I2V 链路 pass（2026-08-02 smoke；2026-08-06 A/B 832×480/3s ≈ 1.50 min）；2026-08-13 五段姿态关键帧动作试验改善运动，但连接/尾帧连续性仍为 partial |
 | Wan 2.2 T2V 14B FP8 | `diffusion_models\wan2.2_t2v_high/low_noise_14B_fp8_scaled.safetensors`；`loras\wan2.2_t2v_lightx2v_4steps_lora_v1.1_high/low_noise.safetensors` | T2V 链路 pass（2026-08-06 A/B 832×480/3s ≈ 2.10 min，无声） |
 | Wan 2.1 T2V 1.3B FP16 | `diffusion_models\wan2.1_t2v_1.3B_fp16.safetensors` | 语义 smoke pass，非生产画质 |
 | MiniMax H3 FL2VA Q4 | `unet\MiniMax-H3-FL2VA-Q4_K_M.gguf`；`text_encoders\qwen3vl_32b_minimax_h3-Q4_K_M.gguf`；`vae\minimax_h3_video_vae_fp16.safetensors`、`vae\minimax_h3_audio_vae_fp32.safetensors` | T2V/I2V pass（含原生 32kHz 立体声）；TeaCache ≈ 2.05×（2026-08-06） |
@@ -67,6 +67,8 @@ Wan 2.2 T2V 14B 快路径参数：高/低噪声各 4 步（LightX2V v1.1 LoRA）
 | --- | --- |
 | 角色一致关键帧 + 姿态/构图 | 参考图 → PuLID-Flux → FLUX Union ControlNet → 图像输出 |
 | 本地 Wan 图生视频 | 首帧 → Wan I2V 高/低噪声阶段 → 采样 → VAE 解码 → 视频合成 |
+| 长动作 Wan I2V | 按动作节拍拆为短段；每段保存批准首帧/姿态关键帧，记录交界帧；未验证尾帧入口时必须标注连接为 partial |
+| 整人替换/重建 | 授权目标参考 → PuLID 身份 → Union ControlNet/depth/pose 结构 → 分段 Wan I2V；不是 ReActor/SimSwap/FaceFusion 式专用换脸 |
 | 本地 MiniMax H3 文/图生视频 | GGUF FL2VA → MiniMaxH3ImageToVideo（首/尾帧可选）→ res_multistep 采样 → 视频+音频 VAE 解码 → CreateVideo（原生 32kHz 立体声） |
 | 相邻镜头无切换 | 前镜尾帧 = 后镜首帧；入口不支持尾帧时明确标注 |
 | 精确文字、价格、余额、商品 UI | 使用确定性后期合成；不要让生成模型重画 |
@@ -111,6 +113,8 @@ For Video-Depth-Anything workflows, grayscale output is always the structural de
 6. 需要声明 Desktop 画布通过时，将当前画布副本放入上述 Desktop 发现目录，在工作流侧边栏双击打开为独立标签，确认图形、连线可见且未出现缺失节点/模型提示。先新建空白标签，绝不覆盖用户已有未保存画布；这项验收仍不等于视觉质量通过。
 
 Wan T2V 的原生入口没有参考图输入时，只能验收运行和基础语义，不能验收角色卡身份一致性。PuLID + Union 的 API 成功也只证明节点链路；必须把输出脸部与授权参考图并列人工检查，且 ControlNet 引导图必须实际包含要约束的服装/道具轮廓。Canvas/API 三件套和 API 输出不能替代在 Desktop 画布中打开、检查缺失节点/模型与连线的验收。
+
+多段 Wan I2V 仅在每段都保存输入、交界帧、输出和拼接顺序时才可称为可复核的动作方案。没有已验证的尾帧绑定时，不能把前段末帧等同于后段约束，也不能把“整人重建”称为已安装的专用换脸能力。
 
 ## 用户如何使用交付物
 
