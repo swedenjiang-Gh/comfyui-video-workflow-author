@@ -17,6 +17,12 @@ description: Use when creating, adapting, explaining, testing, or automating a C
 
 画布 JSON 是给用户在 ComfyUI 中查看、拖拽和继续编辑的母版。API JSON 是提交 `POST http://127.0.0.1:8188/prompt` 的节点输入图，不是同一种文件格式。
 
+## 输出归属
+
+- 原生、独立的 ComfyUI 视频任务保存到 `D:\Video\Comfyui\Video\<job>\`，图片任务保存到 `D:\Video\Comfyui\Image\<job>\`。`SaveVideo`/`SaveImage` 的相对前缀必须分别以 `Video/<job>/`、`Image/<job>/` 开头。
+- 当 ComfyUI 只是 `video-depth-map`、`video-prompt-reverse`、短剧或视频项目的执行器时，最终成果归主 Skill 或项目目录。ComfyUI 输出仅作生成暂存，验收后移动到所属目录，不保留永久重复副本。
+- `workflow-library`、Desktop 可发现副本和运行说明是可复用工作流资产，不属于媒体产出目录，不迁移。
+
 ## 本机 API 按需启动
 
 本机已配置名为 `ComfyUI Local API` 的当前用户按需任务。它运行 `D:\Comfy-Desktop\ComfyUI-Shared\scripts\Start-ComfyUI-Api.ps1`，使用 `ComfyUI\.venv\Scripts\python.exe` 启动后端，并且只监听 `127.0.0.1:8188`；不需要打开 Desktop 界面，也不应在登录 Windows 时常驻。
