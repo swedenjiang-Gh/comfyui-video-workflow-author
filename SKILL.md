@@ -19,7 +19,7 @@ description: Use when creating, adapting, explaining, testing, or automating a C
 
 ## 输出归属
 
-- 原生、独立的 ComfyUI 视频任务保存到 `D:\Video\Comfyui\Video\<job>\`，图片任务保存到 `D:\Video\Comfyui\Image\<job>\`。`SaveVideo`/`SaveImage` 的相对前缀必须分别以 `Video/<job>/`、`Image/<job>/` 开头。
+- 原生、独立的 ComfyUI 视频任务保存到 `D:\MediaStudio\Comfyui\Video\<job>\`，图片任务保存到 `D:\MediaStudio\Comfyui\Image\<job>\`。`SaveVideo`/`SaveImage` 的相对前缀必须分别以 `Video/<job>/`、`Image/<job>/` 开头。
 - 当 ComfyUI 只是 `video-depth-map`、`video-prompt-reverse`、短剧或视频项目的执行器时，最终成果归主 Skill 或项目目录。ComfyUI 输出仅作生成暂存，验收后移动到所属目录，不保留永久重复副本。
 - `workflow-library`、Desktop 可发现副本和运行说明是可复用工作流资产，不属于媒体产出目录，不迁移。
 
